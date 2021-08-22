@@ -1,0 +1,10 @@
+mounts:
+  - ./:/
+
+privilege:
+  admins:
+    admin:
+      password: password1
+
+cors:
+  - '*'

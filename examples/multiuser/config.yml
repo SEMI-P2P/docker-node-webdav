@@ -1,0 +1,42 @@
+mounts:
+  - music:/music
+  - video:/video
+  - files:/myfiles
+
+privilege:
+  default:
+    directories:
+      /music:
+        - read
+  admins:
+    admin:
+      password: password1
+  users:
+    musicwriter:
+      password: password2
+      directories:
+        /music:
+          - read
+          - write
+          - writeLocks
+          - readLocks
+    videowriter:
+      password: password3
+      directories:
+        /video:
+          - all
+    filewriter:
+      password: password4
+      directories:
+        /myfiles:
+          - all
+    mediareader:
+      password: password5
+      directories:
+        /music:
+          - read
+        /video:
+          - read
+
+cors:
+  - '*'

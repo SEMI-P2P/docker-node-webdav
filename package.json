@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "js-yaml": "^4.1.0",
+    "webdav-server": "^2.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {}
+}
