@@ -2,9 +2,7 @@ const webdav = require('webdav-server').v2;
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
-const { createManagers } = require('./utils');
-const express = require('express');
-const cors = require('cors');
+const { createManagers, createBeforeRequestHandler } = require('./utils');
 
 const CONFIG_PATH = path.resolve(__dirname, '../config.yml');
 
@@ -33,24 +31,12 @@ const config = yaml.load(fs.readFileSync(CONFIG_PATH));
         await server.setFileSystemAsync(virtualPath, physicalFs);
     }));
 
-    const app = express();
-    app.use(webdav.extensions.express('/', server));
-
     // CORS
     if('cors' in config) {
-        const origins = config['cors'];
-        if(origins.includes('*')) {
-            app.use(cors({ origin: '*' }));
-        } else {
-            app.use(cors({
-                origin(origin, callback) {
-                    callback(null, origins.includes(origin));
-                }
-            }));
-        }
+        server.beforeRequest(createBeforeRequestHandler(config.cors));
     }
 
     // Start server
-    app.listen(80);
+    await server.startAsync(80);
     console.log('Server started');
 })();

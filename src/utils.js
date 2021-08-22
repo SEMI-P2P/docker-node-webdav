@@ -46,3 +46,47 @@ module.exports.createManagers = privilege => {
         privilegeManager
     });
 };
+
+module.exports.createBeforeRequestHandler = cors => {
+    if(cors.includes('*'))
+        return createHandler(undefined, true)
+    else
+        return createHandler(origin => cors.includes(origin));
+    
+    function createHandler(isAllowed, isAny = false) {
+        return (ctx, next) => {
+            ctx.response.setHeader('DAV', '1,2');
+
+            const origin = ctx.request.headers.origin;
+
+            if(isAny) {
+                ctx.response.setHeader('Access-Control-Allow-Origin', '*');
+            } else if(isAllowed(origin)) {
+                ctx.response.setHeader('Access-Control-Allow-Origin', origin);
+            } else {
+                ctx.response.removeHeader('Access-Control-Allow-Origin');
+            }
+
+            ctx.response.setHeader(
+                'Access-Control-Allow-Headers',
+                'Authorization, Depth, Content-Type',
+            );
+            ctx.response.setHeader(
+                'Access-Control-Expose-Headers',
+                'DAV, Content-Length, Allow, WWW-Authenticate',
+            );
+
+            ctx.response.setHeader(
+                'Access-Control-Allow-Methods',
+                'PROPPATCH,PROPFIND,OPTIONS,DELETE,UNLOCK,COPY,LOCK,MOVE,HEAD,POST,PUT,GET',
+            );
+            
+            if (ctx.request.method === 'OPTIONS') {
+                ctx.setCode(200);
+                ctx.exit();
+            } else {
+                next();
+            }
+        };
+    }
+};
